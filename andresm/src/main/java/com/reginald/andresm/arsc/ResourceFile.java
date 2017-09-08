@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -55,7 +55,7 @@ public final class ResourceFile implements SerializableResource {
 
   /** Returns the chunks in this resource file. */
   public List<Chunk> getChunks() {
-    return Collections.unmodifiableList(chunks);
+    return chunks;
   }
 
   @Override

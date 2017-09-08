@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import java.nio.ByteBuffer;
 
 import javax.annotation.Nullable;
 
-/** Represents the ending tag of a namespace in an XML document. */
-public final class XmlNamespaceEndChunk extends XmlNamespaceChunk {
+/** Represents the starting tag of a namespace in an XML document. */
+public final class XmlNamespaceStartChunk extends XmlNamespaceChunk {
 
-  protected XmlNamespaceEndChunk(ByteBuffer buffer, @Nullable Chunk parent) {
+  protected XmlNamespaceStartChunk(ByteBuffer buffer, @Nullable Chunk parent) {
     super(buffer, parent);
   }
 
   @Override
   protected Type getType() {
-    return Chunk.Type.XML_END_NAMESPACE;
+    return Chunk.Type.XML_START_NAMESPACE;
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -103,6 +103,13 @@ public abstract class Chunk implements SerializableResource {
     offset = buffer.position() - 2;
     headerSize = (buffer.getShort() & 0xFFFF);
     chunkSize = buffer.getInt();
+  }
+
+  protected Chunk(Chunk parent, int headerSize, int chunkSize, int offset) {
+    this.parent = parent;
+    this.headerSize = headerSize;
+    this.chunkSize = chunkSize;
+    this.offset = offset;
   }
 
   /**
@@ -299,4 +306,10 @@ public abstract class Chunk implements SerializableResource {
     result.seekToEndOfChunk(buffer);
     return result;
   }
+
+  public String toArscString() {
+    return String.format(" parent = %s, headerSize = %d, chunkSize = %d, offset = %d ",
+            parent, headerSize, chunkSize, offset);
+  }
+
 }

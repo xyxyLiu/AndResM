@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import java.io.IOException;
 

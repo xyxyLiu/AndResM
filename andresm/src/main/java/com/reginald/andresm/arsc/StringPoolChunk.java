@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
@@ -83,6 +83,12 @@ public final class StringPoolChunk extends Chunk {
    * preserve the deduping of strings for pools that have been deduped.
    */
   private boolean isOriginalDeduped = false;
+
+  @Override
+  public String toArscString() {
+    return String.format("StringPoolChunk[ %s flags = %d, stringsStart = %d, stringCount = %d, stylesStart = %d, styleCount = %d, strings = %s ]",
+            super.toArscString(), flags, stringsStart, stringCount, stylesStart, stringCount, strings);
+  }
 
   protected StringPoolChunk(ByteBuffer buffer, @Nullable Chunk parent) {
     super(buffer, parent);

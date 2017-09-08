@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.common.primitives.UnsignedBytes;
 
@@ -78,5 +78,10 @@ public final class TypeSpecChunk extends Chunk {
     for (int resource : resources) {
       output.writeInt(resource);
     }
+  }
+
+  @Override
+  public String toArscString() {
+    return String.format("TypeSpecChunk [ %s id = %s, len = %d ]", super.toArscString(), Integer.toHexString(id), resources.length);
   }
 }

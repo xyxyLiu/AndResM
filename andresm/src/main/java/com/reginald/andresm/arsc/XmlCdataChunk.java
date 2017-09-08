@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -22,55 +22,53 @@ import java.nio.ByteBuffer;
 
 import javax.annotation.Nullable;
 
-/** Represents the end of an XML node. */
-public final class XmlEndElementChunk extends XmlNodeChunk {
+/** Represents an XML cdata node. */
+public final class XmlCdataChunk extends XmlNodeChunk {
 
-  /** A string reference to the namespace URI, or -1 if not present. */
-  private final int namespace;
+  /** A string reference to a string containing the raw character data. */
+  private final int rawValue;
 
-  /** A string reference to the attribute name. */
-  private final int name;
+  /** A {@link ResourceValue} instance containing the parsed value. */
+  private final ResourceValue resourceValue;
 
-  protected XmlEndElementChunk(ByteBuffer buffer, @Nullable Chunk parent) {
+  protected XmlCdataChunk(ByteBuffer buffer, @Nullable Chunk parent) {
     super(buffer, parent);
-    namespace = buffer.getInt();
-    name = buffer.getInt();
+    rawValue = buffer.getInt();
+    resourceValue = ResourceValue.create(buffer);
   }
 
-  /** Returns the namespace URI, or the empty string if no namespace is present. */
-  public String getNamespace() {
-    return getString(namespace);
+  /** Returns a string containing the raw character data of this chunk. */
+  public String getRawValue() {
+    return getString(rawValue);
   }
 
-  /** Returns the attribute name. */
-  public String getName() {
-    return getString(name);
+  /** Returns a {@link ResourceValue} instance containing the parsed cdata value. */
+  public ResourceValue getResourceValue() {
+    return resourceValue;
   }
 
   @Override
   protected Type getType() {
-    return Chunk.Type.XML_END_ELEMENT;
+    return Chunk.Type.XML_CDATA;
   }
 
   @Override
   protected void writePayload(DataOutput output, ByteBuffer header, boolean shrink)
       throws IOException {
     super.writePayload(output, header, shrink);
-    output.writeInt(namespace);
-    output.writeInt(name);
+    output.writeInt(rawValue);
+    output.write(resourceValue.toByteArray());
   }
 
   /**
    * Returns a brief description of this XML node. The representation of this information is
    * subject to change, but below is a typical example:
    *
-   * <pre>
-   * "XmlEndElementChunk{line=1234, comment=My awesome comment., namespace=foo, name=bar}"
-   * </pre>
+   * <pre>"XmlCdataChunk{line=1234, comment=My awesome comment., value=1234}"</pre>
    */
   @Override
   public String toString() {
-    return String.format("XmlEndElementChunk{line=%d, comment=%s, namespace=%s, name=%s}",
-        getLineNumber(), getComment(), getNamespace(), getName());
+    return String.format("XmlCdataChunk{line=%d, comment=%s, value=%s}",
+        getLineNumber(), getComment(), getRawValue());
   }
 }

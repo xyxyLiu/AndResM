@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.io.LittleEndianDataOutputStream;
 import com.google.common.primitives.UnsignedBytes;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,6 +59,21 @@ public final class TypeChunk extends Chunk {
 
   /** A sparse list of resource entries defined by this chunk. */
   private final Map<Integer, Entry> entries = new TreeMap<>();
+
+  @Override
+  public String toArscString() {
+    StringBuilder entriesStr = new StringBuilder();
+    entriesStr.append("[\n");
+    for (Map.Entry<Integer, Entry> mapEntry : entries.entrySet()) {
+      entriesStr.append(String.format("id = %s, entry = %s",
+              Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+      entriesStr.append("\n");
+    }
+    entriesStr.append("]\n");
+
+    return String.format("TypeChunk [ %s id = %s, entryCount = %d, entriesStart = %d, configuration = %s, entries = %s]",
+            super.toArscString(), Integer.toHexString(id), entryCount, entriesStart, configuration, entriesStr);
+  }
 
   protected TypeChunk(ByteBuffer buffer, @Nullable Chunk parent) {
     super(buffer, parent);
@@ -113,7 +130,7 @@ public final class TypeChunk extends Chunk {
 
   /** Returns a sparse list of 0-based indices to resource entries defined by this chunk. */
   public Map<Integer, Entry> getEntries() {
-    return Collections.unmodifiableMap(entries);
+    return entries;
   }
 
   /** Returns true if this chunk contains an entry for {@code resourceId}. */
@@ -241,6 +258,8 @@ public final class TypeChunk extends Chunk {
     output.write(baos.toByteArray());
   }
 
+
+
   /** An {@link Entry} in a {@link TypeChunk}. Contains one or more {@link ResourceValue}. */
   @AutoValue
   public abstract static class Entry implements SerializableResource {
@@ -297,6 +316,25 @@ public final class TypeChunk extends Chunk {
     /** Returns true if this is a complex resource. */
     public final boolean isComplex() {
       return (flags() & FLAG_COMPLEX) != 0;
+    }
+
+    public String toArscString() {
+      StringBuilder valueStr = new StringBuilder();
+      valueStr.append("[\n");
+      if (isComplex()) {
+
+        for (Map.Entry<Integer, ResourceValue> mapEntry : values().entrySet()) {
+          valueStr.append(String.format("id = %s, entry = %s",
+                  Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+          valueStr.append("\n");
+        }
+      } else {
+        valueStr.append(value());
+      }
+      valueStr.append("]\n");
+
+      return String.format("Entry[ keyIndex = %d(%s), headSize = %d, size = %d, parent = %s， isComplex = %b, parentEntry = 0x%08x, value(s) = %s ]",
+              keyIndex(), parent().getKeyName(keyIndex()), headerSize(), size(), parent(), isComplex(), parentEntry(), valueStr);
     }
 
     /**
@@ -377,5 +415,7 @@ public final class TypeChunk extends Chunk {
     public final String toString() {
       return String.format("Entry{key=%s}", key());
     }
+
+
   }
 }

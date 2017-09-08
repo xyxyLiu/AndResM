@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.common.base.Preconditions;
 
@@ -104,7 +104,12 @@ public final class XmlStartElementChunk extends XmlNodeChunk {
 
   /** Returns an unmodifiable list of this XML element's attributes. */
   public List<XmlAttribute> getAttributes() {
-    return Collections.unmodifiableList(attributes);
+    return attributes;
+  }
+
+  public void setAttributes(List<XmlAttribute> list) {
+    attributes.clear();
+    attributes.addAll(list);
   }
 
   @Override

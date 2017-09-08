@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
@@ -122,4 +122,9 @@ public abstract class ResourceValue implements SerializableResource {
     buffer.putInt(data());
     return buffer.array();
   }
+
+  public String toArscString() {
+    return String.format("ResourceValue[ size = %d, type = %s, data = %s ]", size(), type(), Integer.toHexString(data()));
+  }
+
 }

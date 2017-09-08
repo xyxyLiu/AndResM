@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
+
+import com.sun.org.apache.regexp.internal.RE;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -71,6 +73,15 @@ public class XmlResourceMapChunk extends Chunk {
     return ResourceIdentifier.create(resources.get(attributeId));
   }
 
+  public List<Integer> getResources() {
+      return resources;
+  }
+
+  public void setResources(List<Integer> resourceList) {
+    resources.clear();
+    resources.addAll(resourceList);
+  }
+
   @Override
   protected Type getType() {
     return Chunk.Type.XML_RESOURCE_MAP;
@@ -83,5 +94,16 @@ public class XmlResourceMapChunk extends Chunk {
     for (Integer resource : resources) {
       output.writeInt(resource);
     }
+  }
+
+  @Override
+  public String toArscString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{ ");
+    for (Integer id: resources) {
+      sb.append(Integer.toHexString(id) + " ");
+    }
+    sb.append("}");
+    return String.format("XmlResourceMapChunk[ resources = %s ]", sb);
   }
 }

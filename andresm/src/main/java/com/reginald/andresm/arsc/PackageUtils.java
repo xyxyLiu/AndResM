@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -46,6 +46,15 @@ public final class PackageUtils {
    * @param packageName The package name that will be written to the buffer.
    */
   public static void writePackageName(ByteBuffer buffer, String packageName) {
-    buffer.put(packageName.getBytes(Charset.forName("UTF-16LE")), 0, PACKAGE_NAME_SIZE);
+    byte[] pkgBytes = packageName.getBytes(Charset.forName("UTF-16LE"));
+    int padding = PACKAGE_NAME_SIZE - pkgBytes.length;
+    if (padding < 0) {
+      throw new IllegalStateException("Too long packageName! " + packageName);
+    }
+    byte[] paddingBytes = padding > 0 ? new byte[padding] : null;
+    buffer.put(packageName.getBytes(Charset.forName("UTF-16LE")), 0, pkgBytes.length);
+    if (paddingBytes != null) {
+      buffer.put(paddingBytes);
+    }
   }
 }

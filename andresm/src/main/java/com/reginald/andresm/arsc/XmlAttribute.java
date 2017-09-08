@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.auto.value.AutoValue;
 
@@ -99,7 +99,7 @@ public abstract class XmlAttribute implements SerializableResource {
    */
   @Override
   public String toString() {
-    return String.format("XmlAttribute{namespace=%s, name=%s, value=%s}",
-        namespace(), name(), rawValue());
+    return String.format("XmlAttribute{ namespace=%s, name=%s, value=%s, typedValue = %s }",
+        namespace(), name(), rawValue(), typedValue().toArscString());
   }
 }

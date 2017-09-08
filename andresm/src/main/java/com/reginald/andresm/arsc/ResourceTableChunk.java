@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.common.base.Preconditions;
 
@@ -53,7 +53,7 @@ public final class ResourceTableChunk extends ChunkWithChunks {
   protected void init(ByteBuffer buffer) {
     super.init(buffer);
     packages.clear();
-    for (Chunk chunk : getChunks().values()) {
+    for (Chunk chunk : getChunks()) {
       if (chunk instanceof PackageChunk) {
         PackageChunk packageChunk = (PackageChunk) chunk;
         packages.put(packageChunk.getPackageName(), packageChunk);
@@ -77,7 +77,7 @@ public final class ResourceTableChunk extends ChunkWithChunks {
 
   /** Returns the packages contained in this resource table. */
   public Collection<PackageChunk> getPackages() {
-    return Collections.unmodifiableCollection(packages.values());
+    return packages.values();
   }
 
   @Override
@@ -90,4 +90,17 @@ public final class ResourceTableChunk extends ChunkWithChunks {
     super.writeHeader(output);
     output.putInt(packages.size());
   }
+
+  @Override
+  public String toArscString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("ResourceTableChunk[ ");
+    sb.append(super.toArscString() + " \n");
+    for (Chunk chunk : getChunks()) {
+      sb.append(chunk.toArscString());
+    }
+    sb.append("\n]");
+    return sb.toString();
+  }
+
 }

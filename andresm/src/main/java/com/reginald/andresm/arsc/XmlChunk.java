@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -39,11 +40,29 @@ public final class XmlChunk extends ChunkWithChunks {
 
   /** Returns a string at the provided (0-based) index if the index exists in the string pool. */
   public String getString(int index) {
-    for (Chunk chunk : getChunks().values()) {
+    for (Chunk chunk : getChunks()) {
       if (chunk instanceof StringPoolChunk) {
         return ((StringPoolChunk) chunk).getString(index);
       }
     }
     throw new IllegalStateException("XmlChunk did not contain a string pool.");
+  }
+
+  @Override
+  public String toArscString() {
+    StringBuilder xmlChunksStr = new StringBuilder();
+    xmlChunksStr.append("[\n");
+    for (Chunk chunk : getChunks()) {
+      String chunkStr = "";
+      if (chunk instanceof XmlNodeChunk) {
+        chunkStr = chunk.toString();
+      } else {
+        chunkStr = chunk.toArscString();
+      }
+      xmlChunksStr.append(String.format("chunk = %s", chunkStr));
+      xmlChunksStr.append("\n");
+    }
+    xmlChunksStr.append("]\n");
+    return String.format("XmlChunk[ chunks = %s ]", xmlChunksStr);
   }
 }

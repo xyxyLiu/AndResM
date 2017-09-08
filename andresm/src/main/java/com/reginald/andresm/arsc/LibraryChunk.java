@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.reginald.andresm;
+package com.reginald.andresm.arsc;
 
 import com.google.auto.value.AutoValue;
 
@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -34,11 +35,27 @@ import javax.annotation.Nullable;
  */
 public final class LibraryChunk extends Chunk {
 
+  public static final int HEADER_SIZE = 12;
+
   /** The number of resources of this type at creation time. */
   private final int entryCount;
 
   /** The libraries used in this chunk (package id + name). */
   private final List<Entry> entries = new ArrayList<>();
+
+  public static LibraryChunk create(Chunk parent, Map<Integer, String> entryMap) {
+    List<Entry> entries = new ArrayList<>();
+    for (Map.Entry<Integer, String> mapEntry : entryMap.entrySet()) {
+      entries.add(new AutoValue_LibraryChunk_Entry(mapEntry.getKey(), mapEntry.getValue()));
+    }
+    return new LibraryChunk(parent, entries);
+  }
+
+  private LibraryChunk(Chunk parent, List<Entry> entries) {
+    super(parent, HEADER_SIZE, 0, 0);
+    entryCount = entries.size();
+    this.entries.addAll(entries);
+  }
 
   protected LibraryChunk(ByteBuffer buffer, @Nullable Chunk parent) {
     super(buffer, parent);
@@ -82,6 +99,17 @@ public final class LibraryChunk extends Chunk {
     }
   }
 
+  @Override
+  public String toArscString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("LibraryChunk[ ");
+    sb.append(super.toArscString() + " ");
+    sb.append(" ,entryCount = " + entryCount);
+    sb.append(" ,entries = " + entries);
+    sb.append("\n]");
+    return sb.toString();
+  }
+
   /** A shared library package-id to package name entry. */
   @AutoValue
   protected abstract static class Entry implements SerializableResource {
@@ -109,9 +137,15 @@ public final class LibraryChunk extends Chunk {
     @Override
     public byte[] toByteArray(boolean shrink) throws IOException {
       ByteBuffer buffer = ByteBuffer.allocate(SIZE).order(ByteOrder.LITTLE_ENDIAN);
+      System.out.println("packageId = " + packageId() + " , packageName = " + packageName());
       buffer.putInt(packageId());
       PackageUtils.writePackageName(buffer, packageName());
       return buffer.array();
+    }
+
+    @Override
+    public String toString() {
+      return String.format("LibraryChunk.Entry[ packageId = 0x%08x, packageName = %s ]", packageId(), packageName());
     }
   }
 }
