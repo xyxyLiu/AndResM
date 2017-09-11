@@ -17,7 +17,6 @@ package com.reginald.andresm
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.compile.JavaCompile
 
 class AndResMPlugin implements Plugin<Project> {
     @Override
@@ -25,38 +24,21 @@ class AndResMPlugin implements Plugin<Project> {
         project.extensions.create("andresm", AndResMExtension)
         AndResMExtension extension = project.andresm
 
-
         project.afterEvaluate {
-
-            println "apply start 1 ... " + new Date().toLocaleString();
-
-            final int customPackageId = extension.packageId
             project.android.applicationVariants.all { variant ->
                 variant.outputs.each { variantOutput ->
-                    String fullName = variant.getName().capitalize();
-
-                    println "variant = " + fullName;
-
                     // hook process resource task
                     def processResources = variantOutput.getProcessResources();
                     processResources.doLast {
-                        println "processResources... manifest = " + processResources.manifestFile
-                        println "processResources... packageOutputFile = " + processResources.packageOutputFile
-                        println "processResources... sourceOutputDir = " + processResources.sourceOutputDir
-
-                        Test.test(processResources.packageOutputFile);
-                    }
-
-                    // hook process java compile task
-                    JavaCompile javaCompile = variant.getJavaCompile()
-                    javaCompile.doFirst {
-                        for (File f : javaCompile.source.files) {
-                            println "check source input " + f.getAbsolutePath()
-                        }
+                        println "process AndResM: 0x7f -> 0x" + Integer.toHexString(extension.packageId) + " ... "
+                        AndResM andResM = new AndResM(extension.packageId)
+                        andResM.enableDebug(extension.debug)
+                        andResM.replaceAaptOutput(processResources.packageOutputFile,
+                                processResources.sourceOutputDir,
+                                processResources.textSymbolOutputDir)
                     }
                 }
             }
-
         }
     }
 }

@@ -84,7 +84,6 @@ public abstract class ChunkWithChunks extends Chunk {
     protected void writePayload(DataOutput output, ByteBuffer header, boolean shrink)
             throws IOException {
         for (Chunk chunk : getChunks()) {
-            System.out.println("writePayload() write Chunk: " + chunk);
             byte[] chunkBytes = chunk.toByteArray(shrink);
             output.write(chunkBytes);
             writePad(output, chunkBytes.length);

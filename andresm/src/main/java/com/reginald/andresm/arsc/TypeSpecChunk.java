@@ -82,6 +82,6 @@ public final class TypeSpecChunk extends Chunk {
 
   @Override
   public String toArscString() {
-    return String.format("TypeSpecChunk [ %s id = %s, len = %d ]", super.toArscString(), Integer.toHexString(id), resources.length);
+    return String.format("TypeSpecChunk [ %s id = %d, len = %d ]", super.toArscString(), id, resources.length);
   }
 }

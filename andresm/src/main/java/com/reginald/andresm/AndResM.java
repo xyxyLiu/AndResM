@@ -1,18 +1,199 @@
+/*
+ * Copyright 2018 xyxyLiu All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.reginald.andresm;
 
-import java.io.File;
+import com.reginald.andresm.arsc.Chunk;
+import com.reginald.andresm.arsc.ResourceFile;
+import com.reginald.andresm.arsc.ResourceTableChunk;
+import com.reginald.andresm.arsc.ResourcesHandler;
 
-/**
- * Created by lxy on 17-9-8.
- */
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class AndResM {
 
+    public static final String DEFAULT_TMP_SUFFIX = ".tmp";
+    public static final String DEFAULT_DEBUG_TAG = "andresm";
 
+    private static final String RESOURCES_ARSC = "resources.arsc";
+    private static final int DEFAULT_PKG_ID = 0x7f;
 
+    private ResourcesHandler mResroucesHandler;
+    private boolean mDebug = true;
 
-    private static File reconfigR(File rFile, int targetId, int rplId) {
+    public AndResM(int targetPkgId, int newPkgId) {
+        ResourcesHandler.Config config = new ResourcesHandler.Config(targetPkgId, newPkgId);
+        mResroucesHandler = new ResourcesHandler(config);
+    }
 
+    public AndResM(int newPkgId) {
+        this(DEFAULT_PKG_ID, newPkgId);
+    }
+
+    public void enableDebug(boolean enabled) {
+        mDebug = enabled;
+    }
+
+    public void replaceAaptOutput(File aaptApk, File sourceOutputDir, File symbolOutputDir) {
+        log(String.format("aaptApk = %s, sourceOutputDir = %s, symbolOutputDir = %s",
+                aaptApk.getAbsolutePath(), sourceOutputDir.getAbsolutePath(), symbolOutputDir.getAbsolutePath()));
+        replaceApk(aaptApk);
+        replaceR(sourceOutputDir);
+        replaceR(symbolOutputDir);
+    }
+
+    /**
+     * replace resources.ap_
+     * @param apk
+     */
+    private void replaceApk(File apk) {
+        ZipOutputStream out = null;
+        try {
+            Map<String, byte[]> entries = CommonUtils.getFiles(apk);
+            File newZip = new File(apk.getAbsolutePath() + DEFAULT_TMP_SUFFIX);
+            out = new ZipOutputStream(new FileOutputStream(newZip));
+            for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+                String name = entry.getKey();
+                byte[] bytes = entry.getValue();
+
+                // handle arsc file
+                if (name.equals(RESOURCES_ARSC)) {
+                    log("transform " + name + " ....");
+                    ResourceFile arscFile = new ResourceFile(bytes);
+                    ResourceFile newArsc = transformChunkFile(arscFile);
+                    // output a human-readable arsc dump file for mDebug
+                    logResourceFile(newArsc, new File(apk.getParentFile(), DEFAULT_DEBUG_TAG + "_arsc.txt"));
+                    bytes = newArsc.toByteArray();
+                } else if (name.endsWith(".xml")) {
+                    // handle xml file.   e.g. AndroidManifest.xml,layout.xml...
+                    log("transform " + name + " ....");
+                    ResourceFile xmlFile = new ResourceFile(bytes);
+                    ResourceFile newXmlArsc = transformChunkFile(xmlFile);
+                    bytes = newXmlArsc.toByteArray();
+                }
+
+                ZipEntry e = new ZipEntry(name);
+                out.putNextEntry(e);
+                out.write(bytes);
+                out.closeEntry();
+            }
+
+            out.close();
+
+            apk.delete();
+            newZip.renameTo(apk);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * replace all 0x7f -> 0xPP in R.java or R.txt
+     * @param rFile
+     */
+    private void replaceR(File rFile) {
+        log("transform " + rFile.getAbsolutePath() + " ...");
+        try {
+            if (rFile.isDirectory()) {
+                for (File file : rFile.listFiles()) {
+                    replaceR(file);
+                }
+            } else {
+                if (rFile.getName().startsWith("R.")) {
+                    mResroucesHandler.handleRFile(rFile);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * replace ids in a chunk file
+     * @param arsc
+     * @return
+     */
+    private ResourceFile transformChunkFile(ResourceFile arsc) {
+        try {
+            mResroucesHandler.handleResourceFile(arsc);
+            return new ResourceFile(arsc.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private void log(String text) {
+        if (mDebug) {
+            System.out.println(String.format("[%s] %s", "AndResM", text));
+        }
+    }
+
+    private void logResourceFile(ResourceFile resourceFile, File logFile) {
+        if (mDebug) {
+            log("output resource dump file to " + logFile.getAbsolutePath());
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(logFile);
+                List<Chunk> chunks = resourceFile.getChunks();
+                for (Chunk chunk : chunks) {
+                    fos.write(chunk.toArscString().getBytes());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (fos != null) {
+                        fos.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void printArsc(ResourceFile resourceFile) {
+        List<Chunk> chunks = resourceFile.getChunks();
+        Chunk firstTable = chunks.get(0);
+        if (firstTable instanceof ResourceTableChunk) {
+            ResourceTableChunk resourceChunk = (ResourceTableChunk) firstTable;
+            log(resourceChunk.toArscString());
+        }
+    }
+
+    private void printXml(ResourceFile resourceFile) {
+        List<Chunk> xmlChunks = resourceFile.getChunks();
+        for (Chunk xc : xmlChunks) {
+            log(xc.toArscString());
+        }
     }
 
 }

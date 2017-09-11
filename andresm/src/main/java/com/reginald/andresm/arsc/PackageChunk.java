@@ -77,8 +77,8 @@ public final class PackageChunk extends ChunkWithChunks {
         StringBuilder typeSpecsStr = new StringBuilder();
         typeSpecsStr.append("[\n");
         for (Map.Entry<Integer, TypeSpecChunk> mapEntry : typeSpecs.entrySet()) {
-            typeSpecsStr.append(String.format("type_id = %s, typeSpecs_chunk = %s",
-                    Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+            typeSpecsStr.append(String.format("type_id = 0x%08x, typeSpecs_chunk = %s",
+                    mapEntry.getKey(), mapEntry.getValue().toArscString()));
             typeSpecsStr.append("\n");
         }
         typeSpecsStr.append("]\n");
@@ -86,8 +86,8 @@ public final class PackageChunk extends ChunkWithChunks {
         StringBuilder typesStr = new StringBuilder();
         typesStr.append("[\n");
         for (Map.Entry<Integer, TypeChunk> mapEntry : types.entries()) {
-            typesStr.append(String.format("type_id = %s, type_chunk = %s",
-                    Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+            typesStr.append(String.format("type_id = 0x%08x, type_chunk = %s",
+                    mapEntry.getKey(), mapEntry.getValue().toArscString()));
             typesStr.append("\n");
         }
         typesStr.append("]\n");
@@ -104,12 +104,13 @@ public final class PackageChunk extends ChunkWithChunks {
 
         stringsStr.append("]\n");
 
-        return String.format("PackageChunk[ %s id = %s, packageName = %s(%s), typeStringsOffset = %s, lastPublicType = %s, keyStringsOffset = %s, lastPublicKey = %s, typeIdOffset = %s, \n" +
+        return String.format("PackageChunk[ %s id = 0x%02x, packageName = %s, typeStringsOffset = 0x%08x, lastPublicType = 0x%08x, " +
+                        "keyStringsOffset = 0x%08x, lastPublicKey = 0x%08x, typeIdOffset = 0x%08x, \n" +
                         "library = %s \n" +
                         "strings = %s, \n" +
                         "typeSpecs = %s, \n" +
-                        "types = %s ]", super.toArscString(), Integer.toHexString(id), packageName, byteArrayToHex(packageName.getBytes(Charset.forName("UTF-16LE"))), Integer.toHexString(typeStringsOffset),
-                Integer.toHexString(lastPublicType), Integer.toHexString(keyStringsOffset), Integer.toHexString(lastPublicKey), Integer.toHexString(typeIdOffset),
+                        "types = %s ]", super.toArscString(), id, packageName, typeStringsOffset,
+                lastPublicType, keyStringsOffset, lastPublicKey, typeIdOffset,
                 libraryChunk != null ? libraryChunk.toArscString() : "NULL", stringsStr, typeSpecsStr, typesStr);
     }
 
@@ -143,11 +144,6 @@ public final class PackageChunk extends ChunkWithChunks {
                 typeSpecs.put(typeSpecChunk.getId(), typeSpecChunk);
             } else if ((chunk instanceof StringPoolChunk)) {
                 StringPoolChunk stringPoolChunk = (StringPoolChunk) chunk;
-                System.out.println("init() packageName = " + packageName +
-                        " ,chunk.offset = " + chunk.offset +
-                        " ,keyStringsOffset = " + (keyStringsOffset + this.offset) +
-                        " ,typeStringsOffset = " + (typeStringsOffset + this.offset) +
-                        " ,typeIdOffset = " + typeIdOffset);
                 if (chunk.offset == keyStringsOffset + this.offset) {
                     keyStringPool = stringPoolChunk;
                 } else if (chunk.offset == typeStringsOffset + this.offset) {
@@ -261,7 +257,6 @@ public final class PackageChunk extends ChunkWithChunks {
         int keyOffset = keyStringsOffset;
         int payloadOffset = 0;
         for (Chunk chunk : getChunks()) {
-            System.out.println("writePayload() chunk = " + chunk + ", payloadOffset = " + payloadOffset);
             if (chunk == getTypeStringPool()) {
                 typeOffset = payloadOffset + getHeaderSize();
             } else if (chunk == getKeyStringPool()) {
@@ -271,7 +266,6 @@ public final class PackageChunk extends ChunkWithChunks {
             output.write(chunkBytes);
             payloadOffset += writePad(output, chunkBytes.length);
         }
-        System.out.println("writePayload() typeOffset = " + typeOffset + " , keyOffset = " + keyOffset);
         header.putInt(TYPE_OFFSET_OFFSET, typeOffset);
         header.putInt(KEY_OFFSET_OFFSET, keyOffset);
     }

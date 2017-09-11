@@ -98,6 +98,7 @@ public final class ResourceTableChunk extends ChunkWithChunks {
     sb.append(super.toArscString() + " \n");
     for (Chunk chunk : getChunks()) {
       sb.append(chunk.toArscString());
+      sb.append("\n");
     }
     sb.append("\n]");
     return sb.toString();

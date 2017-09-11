@@ -1,6 +1,5 @@
 package com.reginald.andresm;
 
-
 import com.google.common.io.ByteStreams;
 
 import java.io.BufferedInputStream;
@@ -14,9 +13,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * Utilities for working with apk files.
- */
 public final class CommonUtils {
 
     private CommonUtils() {
@@ -32,6 +28,16 @@ public final class CommonUtils {
     public static byte[] getFile(File apkFile, String filename) throws IOException {
         Map<String, byte[]> files = getFiles(apkFile, Pattern.quote(filename));
         return files.get(filename);
+    }
+
+    /**
+     * Returns all files in an apk.
+     * @param apkFile The file containing the apk zip archive.
+     * @return A mapping of the matched filenames to their byte contents.
+     * @throws IOException Thrown if a matching file cannot be read from the apk.
+     */
+    public static Map<String, byte[]> getFiles(File apkFile) throws IOException {
+        return getFiles(apkFile, (Pattern) null);
     }
 
     /**
@@ -60,7 +66,7 @@ public final class CommonUtils {
             while (zipEntries.hasMoreElements()) {
                 ZipEntry zipEntry = zipEntries.nextElement();
                 // Visit all files with the given extension
-                if (regex.matcher(zipEntry.getName()).matches()) {
+                if (regex == null || regex.matcher(zipEntry.getName()).matches()) {
                     // Map class name to definition
                     try (InputStream is = new BufferedInputStream(apkZip.getInputStream(zipEntry))) {
                         files.put(zipEntry.getName(), ByteStreams.toByteArray(is));

@@ -124,7 +124,7 @@ public abstract class ResourceValue implements SerializableResource {
   }
 
   public String toArscString() {
-    return String.format("ResourceValue[ size = %d, type = %s, data = %s ]", size(), type(), Integer.toHexString(data()));
+    return String.format("ResourceValue[ size = %d, type = %s, data = 0x%08x ]", size(), type(), data());
   }
 
 }

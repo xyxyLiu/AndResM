@@ -101,7 +101,7 @@ public class XmlResourceMapChunk extends Chunk {
     StringBuilder sb = new StringBuilder();
     sb.append("{ ");
     for (Integer id: resources) {
-      sb.append(Integer.toHexString(id) + " ");
+      sb.append(String.format("0x%08x ", id));
     }
     sb.append("}");
     return String.format("XmlResourceMapChunk[ resources = %s ]", sb);

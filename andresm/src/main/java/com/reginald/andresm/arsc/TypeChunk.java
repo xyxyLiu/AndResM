@@ -58,21 +58,21 @@ public final class TypeChunk extends Chunk {
   private ResourceConfiguration configuration;
 
   /** A sparse list of resource entries defined by this chunk. */
-  private final Map<Integer, Entry> entries = new TreeMap<>();
+  private final TreeMap<Integer, Entry> entries = new TreeMap<>();
 
   @Override
   public String toArscString() {
     StringBuilder entriesStr = new StringBuilder();
     entriesStr.append("[\n");
     for (Map.Entry<Integer, Entry> mapEntry : entries.entrySet()) {
-      entriesStr.append(String.format("id = %s, entry = %s",
-              Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+      entriesStr.append(String.format("id = %d, entry = %s",
+              mapEntry.getKey(), mapEntry.getValue().toArscString()));
       entriesStr.append("\n");
     }
     entriesStr.append("]\n");
 
-    return String.format("TypeChunk [ %s id = %s, entryCount = %d, entriesStart = %d, configuration = %s, entries = %s]",
-            super.toArscString(), Integer.toHexString(id), entryCount, entriesStart, configuration, entriesStr);
+    return String.format("TypeChunk [ %s id = 0x%08x, entryCount = %d, entriesStart = %d, configuration = %s, entries = %s]",
+            super.toArscString(), id, entryCount, entriesStart, configuration, entriesStr);
   }
 
   protected TypeChunk(ByteBuffer buffer, @Nullable Chunk parent) {
@@ -129,8 +129,14 @@ public final class TypeChunk extends Chunk {
   }
 
   /** Returns a sparse list of 0-based indices to resource entries defined by this chunk. */
-  public Map<Integer, Entry> getEntries() {
+  public TreeMap<Integer, Entry> getEntries() {
     return entries;
+  }
+
+  /** Set a sparse list of 0-based indices to resource entries defined by this chunk. */
+  public void setEntries(TreeMap<Integer, Entry> newEntries) {
+    entries.clear();
+    entries.putAll(newEntries);
   }
 
   /** Returns true if this chunk contains an entry for {@code resourceId}. */
@@ -324,8 +330,8 @@ public final class TypeChunk extends Chunk {
       if (isComplex()) {
 
         for (Map.Entry<Integer, ResourceValue> mapEntry : values().entrySet()) {
-          valueStr.append(String.format("id = %s, entry = %s",
-                  Integer.toHexString(mapEntry.getKey()), mapEntry.getValue().toArscString()));
+          valueStr.append(String.format("id = 0x%08x, entry = %s",
+                  mapEntry.getKey(), mapEntry.getValue().toArscString()));
           valueStr.append("\n");
         }
       } else {

@@ -1,8 +1,24 @@
 apply plugin: 'com.android.application'
-apply plugin: 'andresm'
+apply plugin: 'com.reginald.andresm'
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url uri('../repo')
+        }
+    }
+    dependencies {
+        classpath('com.reginald:andresm:0.1.0') {
+            // for debug only
+            changing = true
+        }
+    }
+}
 
 andresm {
-    enable = true
+    debug = true
+    packageId = 0x50
 }
 
 android {
@@ -32,4 +48,5 @@ configurations.all {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.reginald:patternlock:1.1.0'
+    compile "com.android.support:appcompat-v7:25.1.0"
 }

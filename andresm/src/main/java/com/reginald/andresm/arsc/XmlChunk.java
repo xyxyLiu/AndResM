@@ -53,7 +53,7 @@ public final class XmlChunk extends ChunkWithChunks {
     StringBuilder xmlChunksStr = new StringBuilder();
     xmlChunksStr.append("[\n");
     for (Chunk chunk : getChunks()) {
-      String chunkStr = "";
+      String chunkStr;
       if (chunk instanceof XmlNodeChunk) {
         chunkStr = chunk.toString();
       } else {

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndResM</string>
+    <string name="test_str">Joey</string>
 </resources>

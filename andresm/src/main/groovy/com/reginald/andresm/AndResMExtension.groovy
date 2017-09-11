@@ -16,7 +16,7 @@
 package com.reginald.andresm;
 
 public class AndResMExtension {
-    private boolean enable = true;
+    private boolean debug = false;
     private int packageId = 0x7f;
 
     public int getPackageId() {
@@ -25,16 +25,16 @@ public class AndResMExtension {
 
     public void setPackageId(int id) {
         if(id < 0x02 || id > 0x7f) {
-            throw new IllegalArgumentException("custom package id only can be > 0x01 and <= 0.7f")
+            throw new IllegalArgumentException("invalid package id " + id)
         }
         packageId = id;
     }
 
-    public void setEnable(boolean b) {
-        enable = b;
+    public void setDebug(boolean b) {
+        debug = b;
     }
 
-    public boolean isEnable() {
-        return enable && packageId != 0x7f;
+    public boolean isDebug() {
+        return debug;
     }
 }
