@@ -4,6 +4,8 @@ apply plugin: 'com.reginald.andresm'
 buildscript {
     repositories {
         jcenter()
+
+        // for debug only
         maven {
             url uri('../repo')
         }
@@ -17,6 +19,7 @@ buildscript {
 }
 
 andresm {
+    // debug模式下会输出log
     debug = true
     packageId = 0x50
 }
