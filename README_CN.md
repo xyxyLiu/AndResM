@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         ......
-        classpath 'com.reginald:andresm:0.1.0'
+        classpath 'com.reginald:andresm:0.2.0'
     }
 }
 ```

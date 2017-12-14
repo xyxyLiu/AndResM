@@ -16,8 +16,6 @@
 
 package com.reginald.andresm.arsc;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;

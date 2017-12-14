@@ -17,6 +17,7 @@ package com.reginald.andresm
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import com.reginald.andresm.utils.AndroidGradleCompat
 
 class AndResMPlugin implements Plugin<Project> {
     @Override
@@ -28,17 +29,21 @@ class AndResMPlugin implements Plugin<Project> {
             project.android.applicationVariants.all { variant ->
                 variant.outputs.each { variantOutput ->
                     // hook process resource task
-                    def processResources = variantOutput.getProcessResources();
+                    def processResources = variantOutput.getProcessResources()
                     processResources.doLast {
+                        println "android gradle plugin " + AndroidGradleCompat.getAndroidGradlePluginVersion()
                         println "process AndResM: 0x7f -> 0x" + Integer.toHexString(extension.packageId) + " ... "
                         AndResM andResM = new AndResM(extension.packageId)
                         andResM.enableDebug(extension.debug)
-                        andResM.replaceAaptOutput(processResources.packageOutputFile,
-                                processResources.sourceOutputDir,
-                                processResources.textSymbolOutputDir)
+                        File packageOutputFile = AndroidGradleCompat.fetchPackageOutputFile(processResources)
+                        File sourceOutputDir = AndroidGradleCompat.fetchSourceOutputDirFile(processResources)
+                        File textSymbolOutputDir = AndroidGradleCompat.fetchTextSymbolOutputDir(processResources)
+
+                        andResM.replaceAaptOutput(packageOutputFile, sourceOutputDir, textSymbolOutputDir)
                     }
                 }
             }
         }
     }
+
 }

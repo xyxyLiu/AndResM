@@ -9,15 +9,15 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.google.guava:guava:18.0'
     compile 'com.google.code.findbugs:jsr305:3.0.1'
     compile 'com.google.auto.value:auto-value:1.0'
+    compile 'com.android.tools.build:gradle:2.0.0'
 }
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-version = "0.1.0"
+version = "0.2.0"
 group = "com.reginald"
 
 def siteUrl = 'https://github.com/xyxyLiu/AndResM'    // project homepage
@@ -89,7 +89,7 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            name = '0.1.0'
+            name = '0.2.0'
         }
     }
 }
