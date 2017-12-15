@@ -1,8 +1,11 @@
 # AndResM
 Android gradle plugin for resource package id modification(0x7f -> 0xpp)
 
+support android-gradle-plugin 2.0.0+
 
 :cn:[中文版戳这里](./README_CN.md)
+
+[CHANGE LOG](https://github.com/xyxyLiu/AndResM/blob/master/CHANGELOG.md)
 
 ### Usage
 Import the following code

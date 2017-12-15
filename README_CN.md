@@ -1,6 +1,11 @@
 # AndResM
 实现资源packageId改写的Android gradle插件
 
+支持android-gradle-plugin 2.0.0+
+
+[版本记录](https://github.com/xyxyLiu/AndResM/blob/master/CHANGELOG.md)
+
+
 ### Usage
 请添加如下代码
 
