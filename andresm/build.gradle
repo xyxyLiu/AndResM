@@ -89,7 +89,7 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            name = '0.2.0'
+            name = '0.3.0'
         }
     }
 }
