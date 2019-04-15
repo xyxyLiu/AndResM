@@ -18,6 +18,7 @@ package com.reginald.andresm;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -36,10 +37,15 @@ public class AndResM {
     public static final String DEFAULT_DEBUG_TAG = "andresm";
 
     private static final String RESOURCES_ARSC = "resources.arsc";
+    private static final List<String> RESOURCES_KEEP_DIRS = new ArrayList<>();
     private static final int DEFAULT_PKG_ID = 0x7f;
 
     private ResourcesHandler mResroucesHandler;
     private boolean mDebug = true;
+
+    static {
+        RESOURCES_KEEP_DIRS.add("res/raw/");
+    }
 
     public AndResM(int targetPkgId, int newPkgId) {
         ResourcesHandler.Config config = new ResourcesHandler.Config(targetPkgId, newPkgId);
@@ -111,7 +117,7 @@ public class AndResM {
 
                 // handle arsc file
                 if (name.equals(RESOURCES_ARSC)) {
-                    log("transform " + name + " ....");
+                    log("transform arsc " + name + " ....");
                     ResourceFile arscFile = new ResourceFile(bytes);
                     ResourceFile newArsc = transformChunkFile(arscFile);
                     // output a human-readable arsc dump file for mDebug
@@ -119,10 +125,19 @@ public class AndResM {
                     bytes = newArsc.toByteArray();
                 } else if (name.endsWith(".xml")) {
                     // handle xml file.   e.g. AndroidManifest.xml,layout.xml...
+                    ResourceFile xmlFile = null;
                     log("transform " + name + " ....");
-                    ResourceFile xmlFile = new ResourceFile(bytes);
-                    ResourceFile newXmlArsc = transformChunkFile(xmlFile);
-                    bytes = newXmlArsc.toByteArray();
+
+                    if (isFileKeeped(name, RESOURCES_KEEP_DIRS)) {
+                        log("IGNORE xml file: " + name + " due to keep policy:  " + RESOURCES_KEEP_DIRS);
+                    } else {
+                        xmlFile = new ResourceFile(bytes);
+                    }
+
+                    if (xmlFile != null) {
+                        ResourceFile newXmlArsc = transformChunkFile(xmlFile);
+                        bytes = newXmlArsc.toByteArray();
+                    }
                 }
 
                 ZipEntry e = new ZipEntry(name);
@@ -186,6 +201,15 @@ public class AndResM {
         }
 
         return null;
+    }
+
+    private boolean isFileKeeped(String fileName, List<String> keepPrefixs) {
+        for (String keepPrefix : keepPrefixs) {
+            if (fileName.startsWith(keepPrefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void log(String text) {
