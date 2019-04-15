@@ -17,7 +17,7 @@ dependencies {
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-version = "0.2.0"
+version = "0.3.0"
 group = "com.reginald"
 
 def siteUrl = 'https://github.com/xyxyLiu/AndResM'    // project homepage

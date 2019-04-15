@@ -66,13 +66,12 @@ public class AndResM {
             throw new GradleException("source output NOT found!");
         }
 
-        if (symbolOutputDir == null || !symbolOutputDir.exists()) {
-            throw new GradleException("symbol output NOT found!");
-        }
-
         replaceApkDir(aaptApk);
         replaceR(sourceOutputDir);
-        replaceR(symbolOutputDir);
+
+        if (symbolOutputDir != null && symbolOutputDir.exists()) {
+            replaceR(symbolOutputDir);
+        }
     }
 
     private void replaceApkDir(File apkFile) {

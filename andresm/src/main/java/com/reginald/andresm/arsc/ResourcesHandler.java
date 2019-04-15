@@ -137,7 +137,9 @@ public class ResourcesHandler {
             }
             Map<Integer, String> pkgMap = new LinkedHashMap<>();
             pkgMap.put(mConfig.packageId, packageChunk.getPackageName());
-            packageChunk.addChunk(0, LibraryChunk.create(packageChunk, pkgMap));
+
+            // add Library Chunk at the end of pkg chunks
+            packageChunk.addChunk(packageChunk.getChunks().size(), LibraryChunk.create(packageChunk, pkgMap));
         } else if (chunk instanceof TypeChunk) {
             TypeChunk typeChunk = (TypeChunk) chunk;
             TreeMap<Integer, TypeChunk.Entry> newEntryMap = new TreeMap<>();

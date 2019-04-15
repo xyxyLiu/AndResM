@@ -3,15 +3,15 @@ apply plugin: 'com.reginald.andresm'
 
 buildscript {
     repositories {
-        jcenter()
-
         // for debug only
         maven {
             url uri('../repo')
         }
+
+        jcenter()
     }
     dependencies {
-        classpath('com.reginald:andresm:0.2.0') {
+        classpath('com.reginald:andresm:0.3.0') {
             // for debug only
             changing = true
         }
