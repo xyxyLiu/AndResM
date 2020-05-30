@@ -1,6 +1,6 @@
 package com.reginald.andresm;
 
-import com.google.common.io.ByteStreams;
+import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -20,7 +20,8 @@ public final class CommonUtils {
 
     /**
      * Returns a file whose name matches {@code filename}, or null if no file was found.
-     * @param apkFile The file containing the apk zip archive.
+     *
+     * @param apkFile  The file containing the apk zip archive.
      * @param filename The full filename (e.g. res/raw/foo.bar).
      * @return A byte array containing the contents of the matching file, or null if not found.
      * @throws IOException Thrown if there's a matching file, but it cannot be read from the apk.
@@ -32,6 +33,7 @@ public final class CommonUtils {
 
     /**
      * Returns all files in an apk.
+     *
      * @param apkFile The file containing the apk zip archive.
      * @return A mapping of the matched filenames to their byte contents.
      * @throws IOException Thrown if a matching file cannot be read from the apk.
@@ -42,8 +44,9 @@ public final class CommonUtils {
 
     /**
      * Returns all files in an apk that match a given regular expression.
+     *
      * @param apkFile The file containing the apk zip archive.
-     * @param regex A regular expression to match the requested filenames.
+     * @param regex   A regular expression to match the requested filenames.
      * @return A mapping of the matched filenames to their byte contents.
      * @throws IOException Thrown if a matching file cannot be read from the apk.
      */
@@ -53,8 +56,9 @@ public final class CommonUtils {
 
     /**
      * Returns all files in an apk that match a given regular expression.
+     *
      * @param apkFile The file containing the apk zip archive.
-     * @param regex A regular expression to match the requested filenames.
+     * @param regex   A regular expression to match the requested filenames.
      * @return A mapping of the matched filenames to their byte contents.
      * @throws IOException Thrown if a matching file cannot be read from the apk.
      */
@@ -69,7 +73,7 @@ public final class CommonUtils {
                 if (regex == null || regex.matcher(zipEntry.getName()).matches()) {
                     // Map class name to definition
                     try (InputStream is = new BufferedInputStream(apkZip.getInputStream(zipEntry))) {
-                        files.put(zipEntry.getName(), ByteStreams.toByteArray(is));
+                        files.put(zipEntry.getName(), IOUtils.toByteArray(is));
                     }
                 }
             }

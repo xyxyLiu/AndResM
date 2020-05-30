@@ -14,11 +14,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mTitle = (TextView) findViewById(R.id.title_text);
-        int strId = getResources().getIdentifier("test_str","string", getPackageName());
-        if (strId > 0) {
-            mTitle.setText(strId);
+        String resName = "app_name";
+        int resId = getResources().getIdentifier(resName,"string", getPackageName());
+        if (resId > 0) {
+            mTitle.setText(String.format("R.string.%s = %s\nmy resId is 0x%s",
+                    resName, getString(resId), Integer.toHexString(resId)));
         } else {
-            mTitle.setText("Can not find id!");
+            mTitle.setText("Can NOT find res " + resName);
             mTitle.setTextColor(getResources().getColor(R.color.colorAccent));
         }
     }

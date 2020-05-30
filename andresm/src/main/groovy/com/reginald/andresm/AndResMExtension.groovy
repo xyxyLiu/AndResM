@@ -17,16 +17,22 @@ package com.reginald.andresm;
 
 public class AndResMExtension {
     private boolean debug = false;
+    private int targetPackageId = 0x7f;
     private int packageId = 0x7f;
+
+    public int getTargetPackageId() {
+        return targetPackageId;
+    }
+
+    public void setTargetPackageId(int id) {
+        targetPackageId = id;
+    }
 
     public int getPackageId() {
         return packageId;
     }
 
     public void setPackageId(int id) {
-        if(id < 0x02 || id > 0x7f) {
-            throw new IllegalArgumentException("invalid package id " + id)
-        }
         packageId = id;
     }
 

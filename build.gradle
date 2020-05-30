@@ -2,10 +2,11 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
+        classpath 'com.android.tools.build:gradle:3.6.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
 
@@ -16,7 +17,13 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
+    }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
     }
 }
 

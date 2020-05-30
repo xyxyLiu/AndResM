@@ -14,9 +14,13 @@
 
     <TextView
         android:id="@+id/title_text"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="16dp"
+        android:gravity="center"
+        android:textColor="#ffffff"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_height="wrap_content" />
 
     <com.reginald.patternlockview.PatternLockView
         android:layout_width="match_parent"

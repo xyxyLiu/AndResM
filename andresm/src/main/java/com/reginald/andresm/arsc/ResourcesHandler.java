@@ -15,13 +15,16 @@
  */
 package com.reginald.andresm.arsc;
 
+import com.reginald.andresm.JarModifier;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -62,6 +65,7 @@ public class ResourcesHandler {
 
     /**
      * replace all 0x7f -> 0xPP in R.java or R.txt
+     *
      * @param file
      */
     public void handleRFile(File file) {
@@ -69,9 +73,7 @@ public class ResourcesHandler {
         BufferedReader reader = null;
         try {
             File newFile = new File(file.getAbsolutePath() + DEFAULT_TMP_SUFFIX);
-            if (newFile.exists()) {
-                newFile.delete();
-            }
+            FileUtils.deleteQuietly(newFile);
 
             Pattern pattern = Pattern.compile(String.format("0x%02x[0-9a-fA-F]{6}", mConfig.oldId));
 
@@ -96,28 +98,33 @@ public class ResourcesHandler {
             writer.close();
             reader.close();
 
-            file.delete();
+            FileUtils.deleteQuietly(file);
             newFile.renameTo(file);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
+            IOUtils.closeQuietly(writer);
+            IOUtils.closeQuietly(reader);
+        }
+    }
+
+    public void handleRJar(File file) {
+        JarModifier jarModifier = new JarModifier();
+        try {
+            jarModifier.update(file, new JarModifier.Callback() {
+                @Override
+                public int updatePkgId(int id) {
+                    return reconfigPkgId(id);
                 }
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     /**
-     *
      * There are all together 4 target types of chunk:
      * 1. for arsc file:
      * 1.1 PackageChunk: replace package id in header, add Library Chunk for dynamic package mapping.

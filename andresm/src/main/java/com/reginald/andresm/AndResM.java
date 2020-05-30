@@ -41,7 +41,7 @@ public class AndResM {
     private static final int DEFAULT_PKG_ID = 0x7f;
 
     private ResourcesHandler mResroucesHandler;
-    private boolean mDebug = true;
+    private static boolean sDebug = false;
 
     static {
         RESOURCES_KEEP_DIRS.add("res/raw/");
@@ -56,8 +56,8 @@ public class AndResM {
         this(DEFAULT_PKG_ID, newPkgId);
     }
 
-    public void enableDebug(boolean enabled) {
-        mDebug = enabled;
+    public static void enableDebug(boolean enabled) {
+        sDebug = enabled;
     }
 
     public void replaceAaptOutput(File aaptApk, File sourceOutputDir, File symbolOutputDir) {
@@ -77,6 +77,8 @@ public class AndResM {
 
         if (symbolOutputDir != null && symbolOutputDir.exists()) {
             replaceR(symbolOutputDir);
+        } else {
+            log("symbol output NOT found!");
         }
     }
 
@@ -170,18 +172,19 @@ public class AndResM {
      */
     private void replaceR(File rFile) {
         log("transform " + rFile.getAbsolutePath() + " ...");
-        try {
-            if (rFile.isDirectory()) {
-                for (File file : rFile.listFiles()) {
-                    replaceR(file);
-                }
-            } else {
-                if (rFile.getName().startsWith("R.")) {
+        if (rFile.isDirectory()) {
+            for (File file : rFile.listFiles()) {
+                replaceR(file);
+            }
+        } else {
+            String fileName = rFile.getName();
+            if (fileName.startsWith("R.")) {
+                if (fileName.endsWith(".java") || fileName.endsWith(".txt")) {
                     mResroucesHandler.handleRFile(rFile);
+                } else if (fileName.endsWith(".jar")) {
+                    mResroucesHandler.handleRJar(rFile);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -212,14 +215,8 @@ public class AndResM {
         return false;
     }
 
-    private void log(String text) {
-        if (mDebug) {
-            System.out.println(String.format("[%s] %s", "AndResM", text));
-        }
-    }
-
     private void logResourceFile(ResourceFile resourceFile, File logFile) {
-        if (mDebug) {
+        if (sDebug) {
             log("output resource dump file to " + logFile.getAbsolutePath());
             FileOutputStream fos = null;
             try {
@@ -255,6 +252,12 @@ public class AndResM {
         List<Chunk> xmlChunks = resourceFile.getChunks();
         for (Chunk xc : xmlChunks) {
             log(xc.toArscString());
+        }
+    }
+
+    public static void log(String text) {
+        if (sDebug) {
+            System.out.println(String.format("[%s] %s", "AndResM", text));
         }
     }
 

@@ -9,9 +9,11 @@ buildscript {
         }
 
         jcenter()
+
+        google()
     }
     dependencies {
-        classpath('com.reginald:andresm:0.3.0') {
+        classpath('com.reginald:andresm:0.4.0') {
             // for debug only
             changing = true
         }
@@ -25,12 +27,12 @@ andresm {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.reginald.andresm.demo"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -49,7 +51,7 @@ configurations.all {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.reginald:patternlock:1.1.0'
-    compile "com.android.support:appcompat-v7:25.1.0"
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.reginald:patternlock:1.1.0'
+    implementation "com.android.support:appcompat-v7:25.1.0"
 }

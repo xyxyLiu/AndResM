@@ -1,7 +1,7 @@
 # AndResM
 实现资源packageId改写的Android gradle插件
 
-支持android-gradle-plugin 2.0.0+
+支持android-gradle-plugin 3.6.+
 
 [版本记录](https://github.com/xyxyLiu/AndResM/blob/master/CHANGELOG.md)
 
@@ -17,7 +17,7 @@ buildscript {
     }
     dependencies {
         ......
-        classpath 'com.reginald:andresm:0.3.0'
+        classpath 'com.reginald:andresm:0.4.0'
     }
 }
 ```
@@ -34,7 +34,7 @@ andresm {
 ### 工作原理
 替换所有的aapt编译流程的输出：
 * resources.ap_ : arsc文件及其它所有编译过的二进制xml文件
-* 生成的源文件: R.java
+* 生成的R文件: R.java, R.jar
 
 这里的流程类似与[Small](https://github.com/wequick/Small)的
 [资源id修改流程](https://github.com/wequick/Small/wiki/Android-dynamic-load-resources#repack-android-asset-package)，在此不再赘述

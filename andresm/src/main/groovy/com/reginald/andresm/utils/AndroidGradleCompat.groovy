@@ -15,19 +15,15 @@
  */
 package com.reginald.andresm.utils
 
-import com.android.builder.model.Version
-
 class AndroidGradleCompat {
 
-    static String getAndroidGradlePluginVersion() {
-        return Version.ANDROID_GRADLE_PLUGIN_VERSION
-    }
-
     static File fetchPackageOutputFile(Object task) {
-        if (getAndroidGradlePluginVersion().compareTo("3.0") >= 0) {
-            return task.resPackageOutputFolder
-        } else if (task.properties['packageOutputFile'] != null) {
-            return task.packageOutputFile
+        if (task.properties['resPackageOutputFolder'] != null) {
+            return asFile(task.resPackageOutputFolder)
+        }
+
+        if (task.properties['packageOutputFile'] != null) {
+            return asFile(task.packageOutputFile)
         }
 
         return null
@@ -35,17 +31,37 @@ class AndroidGradleCompat {
 
     static File fetchSourceOutputDirFile(Object task) {
         if (task.properties['sourceOutputDir'] != null) {
-            return task.sourceOutputDir
+            return asFile(task.sourceOutputDir)
         }
+
+        if (task.properties['RClassOutputJar'] != null) {
+            return asFile(task.RClassOutputJar)
+        }
+
         return null
     }
 
     static File fetchTextSymbolOutputDir(Object task) {
-        if (getAndroidGradlePluginVersion().compareTo("3.0") >= 0) {
-            return task.getTextSymbolOutputFile()
-        } else if (task.properties['textSymbolOutputDir'] != null) {
+        try {
+            return asFile(task.getTextSymbolOutputFile())
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+
+        if (task.properties['textSymbolOutputDir'] != null) {
             return task.textSymbolOutputDir
         }
+
         return null
+    }
+
+    static File asFile(Object input) {
+        try {
+            return (File) input;
+        } catch (Exception e) {
+            println(e)
+        }
+
+        return input.getAsFile().get();
     }
 }

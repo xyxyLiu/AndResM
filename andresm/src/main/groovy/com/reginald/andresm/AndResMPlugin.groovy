@@ -31,13 +31,26 @@ class AndResMPlugin implements Plugin<Project> {
                     // hook process resource task
                     def processResources = variantOutput.getProcessResources()
                     processResources.doLast {
-                        println "android gradle plugin " + AndroidGradleCompat.getAndroidGradlePluginVersion()
-                        println "process AndResM: 0x7f -> 0x" + Integer.toHexString(extension.packageId) + " ... "
-                        AndResM andResM = new AndResM(extension.packageId)
-                        andResM.enableDebug(extension.debug)
+                        println(String.format("process AndResM: 0x%s -> 0x%s ... ",
+                                Integer.toHexString(extension.targetPackageId),
+                                Integer.toHexString(extension.packageId)))
+                        AndResM andResM = new AndResM(extension.targetPackageId, extension.packageId)
+                        AndResM.enableDebug(extension.debug)
+
                         File packageOutputFile = AndroidGradleCompat.fetchPackageOutputFile(processResources)
+                        if (extension.debug) {
+                            println "packageOutputFile: " + packageOutputFile
+                        }
+
                         File sourceOutputDir = AndroidGradleCompat.fetchSourceOutputDirFile(processResources)
+                        if (extension.debug) {
+                            println "sourceOutputDir: " + sourceOutputDir
+                        }
+
                         File textSymbolOutputDir = AndroidGradleCompat.fetchTextSymbolOutputDir(processResources)
+                        if (extension.debug) {
+                            println "textSymbolOutputDir: " + textSymbolOutputDir
+                        }
 
                         andResM.replaceAaptOutput(packageOutputFile, sourceOutputDir, textSymbolOutputDir)
                     }
